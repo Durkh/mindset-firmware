@@ -25,7 +25,7 @@
 
 static const char *MQTT_TAG = "MQTT";
 
-static char const * const MQTT_TOPIC = "mindset/+";
+static char * const MQTT_TOPIC = "mindset/+";
 
 static void log_error_if_nonzero(const char *message, int error_code)
 {

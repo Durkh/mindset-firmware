@@ -54,3 +54,6 @@ dkms.conf
 build/
 .cache/
 sdkconfig.old
+managed_components/
+dependencies.lock
+sdkconfig
