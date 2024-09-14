@@ -1,0 +1,6 @@
+[submodule "components/LiquidCrystal"]
+	path = components/LiquidCrystal
+	url = https://github.com/arduino-libraries/LiquidCrystal
+[submodule "components/IRremoteESP8266"]
+	path = components/IRremoteESP8266
+	url = https://github.com/crankyoldgit/IRremoteESP8266
