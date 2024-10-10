@@ -1,6 +1,6 @@
 ## IDF Component Manager Manifest File
 dependencies:
-  hayschan/buzzer: "^1.0.0"
+  #hayschan/buzzer: "^1.0.0"
   espressif/arduino-esp32: "==3.0.4"
   ## Required IDF version
   idf:
