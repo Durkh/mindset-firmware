@@ -16,7 +16,6 @@ extern "C" [[noreturn]] void app_main()
     Serial.begin(115200);
     while(!Serial);
 
-
     ESP_ERROR_CHECK(InitActuatorPins());
 
     esp_err_t ret = nvs_flash_init();
@@ -30,21 +29,7 @@ extern "C" [[noreturn]] void app_main()
 
     mqtt_app_start();
 
-    gpio_set_level(GPIO_NUM_17, 0);
-
     while(true){
         vTaskDelay(portMAX_DELAY);
-        /*
-        vTaskDelay(pdMS_TO_TICKS(2000));
-        printf("toggle\r\n");
-        gpio_set_level(static_cast<gpio_num_t>(17), 1);
-        vTaskDelay(pdMS_TO_TICKS(2000));
-        printf("toggle\r\n");
-        gpio_set_level(static_cast<gpio_num_t>(17), 0);
-
-        vTaskDelay(pdMS_TO_TICKS(2000));
-        printf("toggle\r\n");
-        gpio_set_level(static_cast<gpio_num_t>(17), 1);
-        */
     }
 }

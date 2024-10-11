@@ -13,19 +13,19 @@
 
 #include <cstdio>
 #include <array>
-#include <string.h>
+#include <cstring>
 #include <cassert>
 
 char const * const TAG = "actuator";
 
-typedef struct{
+struct Actuactor_Pins_t{
     int nPins {};
     union {
         const gpio_num_t pin;
         //TODO change array size
         const std::array<gpio_num_t, 6> pins;
     };
-}Actuactor_Pins_t;
+};
 
 class Actuators {
     public:
@@ -46,7 +46,7 @@ class Actuators {
             {.nPins{1}, .pin{RELAY_PINS}}, //relay
             {.nPins{1}, .pin{BUZZER_PINS}}, //buzzer
             {.nPins{1}, .pin{IR_PINS}}, //IR
-            {.nPins{6}, .pins{display_pins}} //display
+            {.nPins{_pinsLen}, .pins{display_pins}} //display
             //{.nPins = 4, .pins = {MOTOR_PINS}} //motor
         };
 
@@ -54,9 +54,25 @@ class Actuators {
         Actuators();
 
         static Actuactor_Pins_t getActuatorPins(const Actuators_t actuator){ return pins[actuator];}
-        static gpio_num_t getPinOf(const Actuators_t actuator) {return pins[actuator].pin;}
-        static gpio_num_t getPinOf(const Actuators_t actuator, const display_pins_t pin) {return pins[actuator].pins[pin];}
+        static gpio_num_t getPinOf(const Actuators_t actuator) {
+            const auto pin = pins[actuator].pin;
+            assert(pin != GPIO_NUM_NC);
+
+            return pin;
+        }
+        static gpio_num_t getPinOf(const Actuators_t actuator, const display_pins_t pinName) {
+            const auto pin = pins[actuator].pins[pinName];
+            assert(pin != GPIO_NUM_NC);
+
+            return pin;
+        }
         static std::array<gpio_num_t, 6> getPinsOf(const Actuators_t actuator) {return pins[actuator].pins;}
+
+        static void test(){
+            for (auto i = 0; i < 6; ++i){
+                printf("pp %d\r\n", pins[5].pins[i]);
+            }
+        }
 
         virtual ~Actuators() = 0;
 };
@@ -64,12 +80,12 @@ class Actuators {
 static TaskHandle_t buzzerTask = nullptr;
 static IRac ac(Actuators::getPinOf(Actuator_IR));
 static LiquidCrystal lcd(
-    Actuators::getPinOf(Actuator_display, Actuators::RS),
-    Actuators::getPinOf(Actuator_display, Actuators::EN),
-    Actuators::getPinOf(Actuator_display, Actuators::D4),
-    Actuators::getPinOf(Actuator_display, Actuators::D5),
-    Actuators::getPinOf(Actuator_display, Actuators::D6),
-    Actuators::getPinOf(Actuator_display, Actuators::D7)
+        Actuators::getPinOf(Actuator_display, Actuators::RS),
+        Actuators::getPinOf(Actuator_display, Actuators::EN),
+        Actuators::getPinOf(Actuator_display, Actuators::D4),
+        Actuators::getPinOf(Actuator_display, Actuators::D5),
+        Actuators::getPinOf(Actuator_display, Actuators::D6),
+        Actuators::getPinOf(Actuator_display, Actuators::D7)
 );
 
 #define GPIO_CONFIG ((1ULL << Actuators::getPinOf(Actuator_LED))   | \
@@ -105,12 +121,9 @@ static void Buzzer_task [[noreturn]] (void *pvParameters){
 esp_err_t InitActuatorPins(){
 
     esp_err_t err;
-    
-    lcd.begin(16, 2);
-    lcd.clear();
-    lcd.print("Initializing");
 
-    gpio_reset_pin(static_cast<gpio_num_t>(18));
+    lcd.begin(16, 2);
+    lcd.print("Initializing");
 
     gpio_config_t io_conf{};
     io_conf.mode = GPIO_MODE_OUTPUT;
@@ -119,8 +132,6 @@ esp_err_t InitActuatorPins(){
     err = gpio_config(&io_conf);
 
     REG_WRITE(GPIO_OUT_W1TC_REG, GPIO_CONFIG);
-
-    gpio_set_level(Actuators::getPinOf(Actuator_relay), 0);
 
     if (err) return err;
 
@@ -206,8 +217,6 @@ Actuators_t toActuator(char const * const topic, const size_t len){
 
     char const * const endpoint = topic + 8;
     const size_t endpointLen = len - 8;
-
-    //printf("subtopic[%d]: %.*s\r\n", endpointLen, endpointLen, endpoint);
 
     if (CMP_ENDPOINT(2, "IR")){
         return Actuator_IR;

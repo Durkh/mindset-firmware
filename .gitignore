@@ -57,3 +57,6 @@ sdkconfig.old
 managed_components/
 dependencies.lock
 sdkconfig
+
+.idea/
+*cmake*/

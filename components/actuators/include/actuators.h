@@ -14,8 +14,8 @@ typedef enum {
     Actuator_relay,
     Actuator_buzzer,
     Actuator_IR,
-    Actuator_motor,
-    Actuator_display
+    Actuator_display,
+    Actuator_motor
 }Actuators_t;
 
 typedef struct {
